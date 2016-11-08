@@ -46,3 +46,18 @@ handlers['delete_buffer'] = function(body) {
 	this.emit('deleted', buffer);
 	delete this.connections[body.cid].buffers[body.bid];
 };
+
+handlers['heartbeat_echo'] = function(body) {
+	if (body.seenEids) {
+		var cid, bid;
+		for (cid in body.seenEids) {
+			if (body.seenEids.hasOwnProperty(cid) && this.connections[cid]) {
+				for (bid in body.seenEids[cid]) {
+					if (body.seenEids[cid].hasOwnProperty(bid) && this.connections[cid].buffers[bid]) {
+						this.connections[cid].buffers[bid].last_seen_eid = body.seenEids[cid][bid];
+					}
+				}
+			}
+		}
+	}
+};
