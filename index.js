@@ -23,5 +23,6 @@ require('./components/auth.js');
 require('./components/websocket.js');
 require('./components/oob.js');
 require('./components/backlog.js');
+require('./components/connections');
 require('./components/channels.js');
 require('./components/account.js');

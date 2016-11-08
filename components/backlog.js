@@ -19,6 +19,7 @@ handlers['makeserver'] = function(body) {
 	delete body.type;
 	delete body.num_buffers;
 	delete body.deferred_archives;
+	delete body.disconnected;
 
 	this.connections[body.cid] = body;
 };
