@@ -13,6 +13,16 @@ IRCCloud.prototype._processMsg = function(data) {
 		}
 	}
 
+	if (data._reqid) {
+		// Response to an RPC command
+		if (this._callbacks[data._reqid]) {
+			this._callbacks[data._reqid].call(this, data);
+			delete this._callbacks[data._reqid];
+		}
+
+		return;
+	}
+
 	if (!data.type) {
 		this.emit('debug', "Got message without a type: " + data);
 		return;

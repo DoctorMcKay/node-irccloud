@@ -1,5 +1,21 @@
 var IRCCloud = require('../index.js');
 
+IRCCloud.prototype.topic = function(buffer, topic, callback) {
+	if (!buffer.cid || !buffer.bid) {
+		throw new Error("Buffer must have cid and bid properties");
+	}
+
+	// valid buffer?
+	var buf = this.connections[buffer.cid].buffers[buffer.bid];
+	if (!buf) {
+		throw new Error(`Buffer ${cid} ${bid} is not valid`);
+	}
+
+	this._send("topic", {"cid": buffer.cid, "channel": buffer.name, "topic": topic}, callback);
+};
+
+// Handlers
+
 var handlers = IRCCloud.prototype._handlers;
 
 handlers['channel_mode'] = function(body) {
@@ -20,6 +36,24 @@ handlers['channel_mode_is'] = function(body) {
 
 handlers['channel_timestamp'] = function(body) {
 	this.connections[body.cid].buffers[body.bid].channelCreated = new Date(body.timestamp * 1000);
+};
+
+handlers['channel_topic'] = function(body) {
+	var buffer = this.connections[body.cid].buffers[body.bid];
+	this.emit('topic', buffer, buildHostObject(body), body.topic, new Date(body.topic_time * 1000));
+
+	if (!body.topic) {
+		buffer.topic = null;
+	} else {
+		buffer.topic = {
+			"text": body.topic,
+			"time": new Date(body.topic_time * 1000),
+			"nick": body.author,
+			"user": body.from_name,
+			"host": body.from_host,
+			"hostmask": body.hostmask
+		};
+	}
 };
 
 handlers['you_joined_channel'] = function(body) {
@@ -101,7 +135,7 @@ handlers['notice'] = function(body) {
 function buildHostObject(body) {
 	return {
 		"user": body.from_name,
-		"nick": body.nick || body.from,
+		"nick": body.nick || body.from || body.author,
 		"host": body.from_host,
 		"hostmask": body.hostmask
 	};

@@ -49,8 +49,14 @@ handlers['channel_init'] = function(body) {
 
 	if (body.topic) {
 		if (body.topic.text) {
-			buffer.topic = body.topic;
-			buffer.topic.time = new Date(buffer.topic.time * 1000);
+			buffer.topic = {
+				"text": body.topic.text,
+				"time": new Date(body.topic.time * 1000),
+				"nick": body.topic.nick,
+				"user": body.topic.user,
+				"host": body.topic.userhost,
+				"hostmask": body.topic.usermask
+			};
 		} else {
 			buffer.topic = null;
 		}
