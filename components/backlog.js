@@ -26,6 +26,14 @@ handlers['makeserver'] = function(body) {
 
 handlers['makebuffer'] = function(body) {
 	body.users = [];
+
+	delete body.eid;
+	delete body.type;
+	delete body.backlog_size;
+	delete body.max_backlog_size;
+
+	body.created = new Date(Math.floor(body.created / 1000));
+
 	this.connections[body.cid].buffers[body.bid] = body;
 };
 
@@ -40,7 +48,12 @@ handlers['channel_init'] = function(body) {
 	}
 
 	if (body.topic) {
-		buffer.topic = body.topic;
+		if (body.topic.text) {
+			buffer.topic = body.topic;
+			buffer.topic.time = new Date(buffer.topic.time * 1000);
+		} else {
+			buffer.topic = null;
+		}
 	}
 
 	if (body.timestamp) {
