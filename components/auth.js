@@ -37,6 +37,7 @@ IRCCloud.prototype.connect = function(email, password) {
 				return;
 			}
 
+			console.log(res);
 			this.uid = res.uid;
 			this._sessionToken = res.session;
 			this._connect();
