@@ -17,15 +17,37 @@ exports.get = function(url, qs, callback) {
 		url.path += qs;
 	}
 
-	Https.get({
-		"hostname": url.hostname,
-		"port": url.port || 443,
-		"protocol": "https:",
-		"path": url.path,
-		"headers": {
-			"Accept-Encoding": "gzip"
+	request({"method": "GET", "hostname": url.hostname, "port": url.port || 443, "path": url.path}, callback);
+};
+
+exports.post = function(url, body, callback) {
+	if (typeof body === 'function') {
+		callback = body;
+		body = null;
+	}
+
+	url = Url.parse(url);
+	request({"method": "POST", "hostname": url.hostname, "port": url.port || 443, "path": url.path, "body": body}, callback);
+};
+
+function request(opts, callback) {
+	opts.protocol = "https:";
+	opts.headers = opts.headers || {};
+	opts.headers['Accept-Encoding'] = 'gzip';
+
+	if (opts.method.toUpperCase() == 'POST') {
+		if (typeof opts.body === 'object') {
+			opts.body = QueryString.stringify(opts.body);
 		}
-	}, (res) => {
+
+		opts.headers['Content-Length'] = Buffer.byteLength(opts.body);
+
+		if (opts.headers['Content-Length'] > 0) {
+			opts.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+		}
+	}
+
+	var req = Https.request(opts, (res) => {
 		if (res.statusCode < 200 || res.statusCode >= 300) {
 			// Anything not in 2xx is failure
 			callback(new Error("HTTP error " + res.statusCode));
@@ -48,7 +70,11 @@ exports.get = function(url, qs, callback) {
 		stream.on('end', () => {
 			callback(null, response);
 		});
-	}).on('error', (err) => {
+	});
+
+	req.on('error', (err) => {
 		callback(err);
 	});
-};
+
+	req.end(opts.body);
+}
