@@ -51,12 +51,12 @@ function request(opts, callback) {
 		}
 	}
 
-	console.log(opts);
 	var req = Https.request(opts, (res) => {
+		var err = null;
+
 		if (res.statusCode < 200 || res.statusCode >= 300) {
 			// Anything not in 2xx is failure
-			callback(new Error("HTTP error " + res.statusCode));
-			return;
+			err = new Error("HTTP error " + res.statusCode);
 		}
 
 		var stream = res;
@@ -73,7 +73,16 @@ function request(opts, callback) {
 		});
 
 		stream.on('end', () => {
-			callback(null, response);
+			if (res.headers['content-type'] && res.headers['content-type'].toLowerCase() == 'application/json') {
+				try {
+					response = JSON.parse(response);
+				} catch (ex) {
+					callback(new Error("Malformed JSON response"));
+					return;
+				}
+			}
+
+			callback(err, response);
 		});
 	});
 
