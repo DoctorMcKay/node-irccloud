@@ -17,13 +17,14 @@ IRCCloud.prototype.deleteBuffer = function(buffer, callback) {
 };
 
 IRCCloud.prototype.getBuffer = function(networkName, bufferName) {
-	for (var i in this.connections) {
-		if (this.connections.hasOwnProperty(i) && this.connections[i].name == networkName) {
-			for (var j in this.connections[i].buffers) {
-				if (this.connections[i].buffers.hasOwnProperty(j) && this.connections[i].buffers[j].name == bufferName) {
-					return this.connections[i].buffers[j];
-				}
-			}
+	var conn = this.getConnection(networkName);
+	if (!conn) {
+		return null;
+	}
+
+	for (var i in conn.buffers) {
+		if (conn.buffers.hasOwnProperty(i) && conn.buffers[i].name == bufferName) {
+			return conn.buffers[i];
 		}
 	}
 

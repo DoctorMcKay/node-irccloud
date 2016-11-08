@@ -1,5 +1,17 @@
 var IRCCloud = require('../index.js');
 
+IRCCloud.prototype.getConnection = function(networkName) {
+	for (var i in this.connections) {
+		if (this.connections.hasOwnProperty(i) && this.connections[i].name == networkName) {
+			return this.connections[i];
+		}
+	}
+
+	return null;
+};
+
+// Handlers
+
 var handlers = IRCCloud.prototype._handlers;
 
 handlers['status_changed'] = function(body) {

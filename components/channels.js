@@ -1,5 +1,39 @@
 var IRCCloud = require('../index.js');
 
+IRCCloud.prototype.join = function(connection, channel, key, callback) {
+	if (typeof key === 'function') {
+		callback = key;
+		key = undefined;
+	}
+
+	if (typeof connection === 'object') {
+		connection = connection.cid;
+	}
+
+	if (isNaN(connection)) {
+		throw new Error("connection must be either an object with a cid property or a numeric connection ID");
+	}
+
+	this._send("join", {"cid": connection, "channel": channel, "key": key}, callback);
+};
+
+IRCCloud.prototype.part = function(connection, channel, msg, callback) {
+	if (typeof msg === 'function') {
+		callback = msg;
+		msg = undefined;
+	}
+
+	if (typeof connection === 'object') {
+		connection = connection.cid;
+	}
+
+	if (isNaN(connection)) {
+		throw new Error("connection must be either an object with a cid property or a numeric connection ID");
+	}
+
+	this._send("part", {"cid": connection, "channel": channel, "msg": msg}, callback);
+};
+
 IRCCloud.prototype.message = function(connection, recipient, message, callback) {
 	if (typeof connection === 'object') {
 		connection = connection.cid;
