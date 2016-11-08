@@ -44,8 +44,6 @@ IRCCloud.prototype._connect = function() {
 			return;
 		}
 
-		this.emit('debug', `Got data: ${data}`);
-
 		if (this._paused) {
 			this._msgQueue.push(data);
 		} else {

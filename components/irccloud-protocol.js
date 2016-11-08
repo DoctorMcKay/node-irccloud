@@ -18,6 +18,10 @@ IRCCloud.prototype._processMsg = function(data) {
 		return;
 	}
 
+	if (data.eid && data.eid > this._lastEid) {
+		this._lastEid = data.eid;
+	}
+
 	if (!this._handlers[data.type]) {
 		this.emit('debug', "Unhandled message " + data.type);
 		return;
