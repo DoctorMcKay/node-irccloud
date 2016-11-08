@@ -3,17 +3,18 @@ var WS13 = require('websocket13');
 
 IRCCloud.prototype._handlers = {};
 
-IRCCloud.prototype._processMsg = function(strData) {
-	var data;
-	try {
-		data = JSON.parse(strData);
-	} catch (ex) {
-		this.emit('debug', "Got malformed JSON for message: " + strData);
-		return;
+IRCCloud.prototype._processMsg = function(data) {
+	if (typeof data === 'string') {
+		try {
+			data = JSON.parse(data);
+		} catch (ex) {
+			this.emit('debug', "Got malformed JSON for message: " + data);
+			return;
+		}
 	}
 
 	if (!data.type) {
-		this.emit('debug', "Got message without a type: " + strData);
+		this.emit('debug', "Got message without a type: " + data);
 		return;
 	}
 

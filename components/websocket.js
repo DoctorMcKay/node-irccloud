@@ -28,11 +28,14 @@ IRCCloud.prototype._connect = function() {
 		this.emit('debug', `disconnected: ${code} (${reason})`);
 		this.emit('disconnect', code, reason, initiatedByUs);
 		this.connected = false;
+		this._ws = null;
 	});
 
 	this._ws.on('error', (err) => {
 		this.emit('error', err);
+		this.emit('disconnect', WS13.StatusCode.NoStatusCode, err.message, false);
 		this.connected = false;
+		this._ws = null;
 	});
 
 	this._ws.on('message', (type, data) => {
@@ -65,6 +68,15 @@ IRCCloud.prototype._setPause = function(paused) {
 		this._msgQueue.forEach(this._processMsg.bind(this));
 		this._msgQueue = [];
 	}
+};
+
+IRCCloud.prototype.disconnect = function() {
+	if (!this._ws) {
+		this.emit('debug', "Attempted to disconnect without a websocket");
+		return;
+	}
+
+	this._ws.disconnect(WS13.StatusCode.NormalClosure);
 };
 
 function getUserAgent() {

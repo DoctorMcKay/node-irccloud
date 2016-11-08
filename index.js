@@ -17,3 +17,4 @@ function IRCCloud() {
 require('./components/irccloud-protocol.js');
 require('./components/auth.js');
 require('./components/websocket.js');
+require('./components/oob.js');

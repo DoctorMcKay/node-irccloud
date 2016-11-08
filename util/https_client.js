@@ -20,6 +20,23 @@ exports.get = function(url, qs, callback) {
 	request({"method": "GET", "hostname": url.hostname, "port": url.port || 443, "path": url.path}, callback);
 };
 
+exports.getAuthed = function(url, session, qs, callback) {
+	if (typeof qs === 'function') {
+		callback = qs;
+		qs = {};
+	}
+
+	url = Url.parse(url);
+
+	qs = QueryString.stringify(qs);
+	if (qs) {
+		url.path += (url.path.indexOf('?') == -1) ? '?' : '&';
+		url.path += qs;
+	}
+
+	request({"method": "GET", "hostname": url.hostname, "port": url.port || 443, "path": url.path, "session": session}, callback);
+};
+
 exports.post = function(url, body, callback) {
 	if (typeof body === 'function') {
 		callback = body;
@@ -34,6 +51,11 @@ function request(opts, callback) {
 	opts.protocol = "https:";
 	opts.headers = opts.headers || {};
 	opts.headers['Accept-Encoding'] = 'gzip';
+
+	if (opts.session) {
+		opts.headers['Cookie'] = 'session=' + encodeURIComponent(opts.session);
+		delete opts.session;
+	}
 
 	if (opts.method.toUpperCase() == 'POST') {
 		if (typeof opts.body === 'object' && opts.body !== null) {
