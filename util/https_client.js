@@ -27,7 +27,7 @@ exports.post = function(url, body, callback) {
 	}
 
 	url = Url.parse(url);
-	request({"method": "POST", "hostname": url.hostname, "port": url.port || 443, "path": url.path, "body": body}, callback);
+	request({"method": "POST", "hostname": url.hostname, "port": url.port || 443, "path": url.path, "body": body || null}, callback);
 };
 
 function request(opts, callback) {
@@ -36,17 +36,22 @@ function request(opts, callback) {
 	opts.headers['Accept-Encoding'] = 'gzip';
 
 	if (opts.method.toUpperCase() == 'POST') {
-		if (typeof opts.body === 'object') {
+		if (typeof opts.body === 'object' && opts.body !== null) {
+			if (opts.body.token) {
+				opts.headers['X-Auth-FormToken'] = opts.body.token;
+			}
+
 			opts.body = QueryString.stringify(opts.body);
 		}
 
-		opts.headers['Content-Length'] = Buffer.byteLength(opts.body);
+		opts.headers['Content-Length'] = opts.body ? Buffer.byteLength(opts.body) : 0;
 
 		if (opts.headers['Content-Length'] > 0) {
 			opts.headers['Content-Type'] = 'application/x-www-form-urlencoded';
 		}
 	}
 
+	console.log(opts);
 	var req = Https.request(opts, (res) => {
 		if (res.statusCode < 200 || res.statusCode >= 300) {
 			// Anything not in 2xx is failure
