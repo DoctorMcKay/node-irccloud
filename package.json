@@ -1,0 +1,14 @@
+{
+	"name": "irccloud",
+	"version": "1.0.0",
+	"description": "Client module for IRCCloud.com hosted IRC service",
+	"author": "Alexander Corn <mckay@doctormckay.com>",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/DoctorMcKay/node-irccloud"
+	},
+	"dependencies": {
+		"websocket13": "^1.2.1"
+	}
+}
