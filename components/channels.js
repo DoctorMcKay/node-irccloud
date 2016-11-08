@@ -94,21 +94,23 @@ handlers['channel_mode'] = function(body) {
 handlers['user_channel_mode'] = function(body) {
 	var buffer = this.connections[body.cid].buffers[body.bid];
 
-	this.emit('userMode', buffer, {
-		"user": body.target_name,
-		"nick": body.nick,
-		"host": body.target_host,
-		"hostmask": body.target_hostmask
-	}, body.ops, body.newmode, {
-		"user": body.from_name,
-		"nick": body.from,
-		"host": body.from_host,
-		"hostmask": body.hostmask
-	});
+	if (!this._loadingBacklog) {
+		this.emit('userMode', buffer, {
+			"user": body.target_name,
+			"nick": body.nick,
+			"host": body.target_host,
+			"hostmask": body.target_hostmask
+		}, body.ops, body.newmode, {
+			"user": body.from_name,
+			"nick": body.from,
+			"host": body.from_host,
+			"hostmask": body.hostmask
+		});
+	}
 
 	for (var i = 0; i < buffer.users.length; i++) {
-		if (buffers.users[i].nick == body.nick) {
-			buffers.users[i].mode = body.newmode;
+		if (buffer.users[i].nick == body.nick) {
+			buffer.users[i].mode = body.newmode;
 		}
 	}
 };
@@ -125,7 +127,10 @@ handlers['channel_timestamp'] = function(body) {
 
 handlers['channel_topic'] = function(body) {
 	var buffer = this.connections[body.cid].buffers[body.bid];
-	this.emit('topic', buffer, buildHostObject(body), body.topic, new Date(body.topic_time * 1000));
+
+	if (!this._loadingBacklog) {
+		this.emit('topic', buffer, buildHostObject(body), body.topic, new Date(body.topic_time * 1000));
+	}
 
 	if (!body.topic) {
 		buffer.topic = null;
@@ -165,6 +170,70 @@ handlers['joined_channel'] = function(body) {
 	if (!buffer.users.some(user => user.nick == body.nick)) {
 		buffer.users.push(buildHostObject(body));
 	}
+};
+
+handlers['parted_channel'] = function(body) {
+	var buffer = this.connections[body.cid].buffers[body.bid];
+
+	if (!this._loadingBacklog) {
+		this.emit('part', buffer, buildHostObject(body), body.msg);
+	}
+
+	removeFromBuffer(buffer, body.nick);
+};
+
+handlers['you_parted_channel'] = function(body) {
+	var buffer = this.connections[body.cid].buffers[body.bid];
+
+	if (!this._loadingBacklog) {
+		this.emit('youPart', buffer, body.msg);
+	}
+
+	buffer.users = [];
+	buffer.initialized = false;
+	buffer.topic = null;
+};
+
+handlers['kicked_channel'] = function(body) {
+	var buffer = this.connections[body.cid].buffers[body.bid];
+
+	if (!this._loadingBacklog) {
+		this.emit('kick', buffer, buildHostObject(body), body.msg, {
+			"nick": body.kicker,
+			"user": body.kicker_name,
+			"host": body.kicker_host,
+			"hostmask": body.kicker_hostmask
+		});
+	}
+
+	removeFromBuffer(buffer, body.nick);
+};
+
+handlers['you_kicked_channel'] = function(body) {
+	var buffer = this.connections[body.cid].buffers[body.bid];
+
+	if (!this._loadingBacklog) {
+		this.emit('youKick', buffer, body.msg, {
+			"nick": body.kicker,
+			"user": body.kicker_name,
+			"host": body.kicker_host,
+			"hostmask": body.kicker_hostmask
+		});
+	}
+
+	buffer.users = [];
+	buffer.initialized = false;
+	buffer.topic = null;
+};
+
+handlers['quit'] = function(body) {
+	var buffer = this.connections[body.cid].buffers[body.bid];
+
+	if (!this._loadingBacklog) {
+		this.emit('quit', buffer, buildHostObject(body), body.msg);
+	}
+
+	removeFromBuffer(buffer, body.nick);
 };
 
 handlers['self_details'] = function(body) {
@@ -215,7 +284,58 @@ handlers['notice'] = function(body) {
 	}
 
 	var buffer = this.connections[body.cid].buffers[body.bid];
-	this.emit('notice', buffer, buildHostObject(body), body.msg, body.target);
+	var suffix = body.from == this.connections[body.cid].nick ? 'Echo' : '';
+	this.emit('notice' + suffix, buffer, buildHostObject(body), body.msg, body.target);
+};
+
+handlers['nickchange'] = function(body) {
+	if (this._loadingBacklog) {
+		return;
+	}
+
+	var buffer = this.connections[body.cid].buffers[body.bid];
+	this.emit('nick', buffer, body.oldnick, body.newnick);
+
+	for (var i = 0; i < buffer.users.length; i++) {
+		if (buffer.users[i].nick == body.oldnick) {
+			buffer.users[i].nick = body.newnick;
+			break;
+		}
+	}
+};
+
+handlers['you_nickchange'] = function(body) {
+	if (this._loadingBacklog) {
+		return;
+	}
+
+	this.emit('youNick', body.oldnick, body.newnick);
+
+	var buffers = this.connections[body.cid].buffers;
+	var bid, i;
+	for (bid in buffers) {
+		if (buffers.hasOwnProperty(bid)) {
+			for (i = 0; i < buffers[bid].users.length; i++) {
+				if (buffers[bid].users[i].nick == body.oldnick) {
+					buffers[bid].users[i].nick = body.newnick;
+					break;
+				}
+			}
+		}
+	}
+
+	this.connections[body.cid].nick = body.newnick;
+};
+
+handlers['rename_conversation'] = function(body) {
+	if (this._loadingBacklog) {
+		return;
+	}
+
+	var buffer = this.connections[body.cid].buffers[body.bid];
+	this.emit('conversationRenamed', buffer, body.new_name);
+
+	buffer.name = body.new_name;
 };
 
 function buildHostObject(body) {
@@ -225,4 +345,16 @@ function buildHostObject(body) {
 		"host": body.from_host,
 		"hostmask": body.hostmask
 	};
+}
+
+function removeFromBuffer(buffer, nick) {
+	if (buffer.buffer_type != 'channel') {
+		return;
+	}
+
+	for (var i = 0; i < buffer.users.length; i++) {
+		if (buffer.users[i].nick == nick) {
+			buffer.users.splice(i, 1);
+		}
+	}
 }

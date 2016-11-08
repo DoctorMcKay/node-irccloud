@@ -37,6 +37,8 @@ handlers['makebuffer'] = function(body) {
 	delete body.max_backlog_size;
 
 	body.created = new Date(Math.floor(body.created / 1000));
+	body.topic = null;
+	body.initialized = false;
 
 	if (!this._loadingBacklog) {
 		this.emit('newBuffer', body);
@@ -73,6 +75,8 @@ handlers['channel_init'] = function(body) {
 	if (body.timestamp) {
 		buffer.channelCreated = new Date(body.timestamp * 1000);
 	}
+
+	buffer.initialized = true;
 
 	if (!this._loadingBacklog) {
 		this.emit('channelInit', buffer);
