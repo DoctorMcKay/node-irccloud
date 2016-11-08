@@ -12,7 +12,7 @@ IRCCloud.prototype._connect = function() {
 	}
 
 	this.emit('debug', 'connecting');
-	this._ws = new WS13.WebSocket("wss://api.irccloud.com/", {
+	this._ws = new WS13.WebSocket(this._wsUri, {
 		"cookies": {"session": this._sessionToken},
 		"headers": {"User-Agent": getUserAgent()},
 		"pingInterval": 30000

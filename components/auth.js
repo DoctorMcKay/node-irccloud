@@ -37,9 +37,11 @@ IRCCloud.prototype.connect = function(email, password) {
 				return;
 			}
 
-			console.log(res);
 			this.uid = res.uid;
 			this._sessionToken = res.session;
+
+			this._wsUri = "wss://" + (res.websocket_host || "api.irccloud.com") + (res.websocket_path || "/");
+
 			this._connect();
 		});
 	});
