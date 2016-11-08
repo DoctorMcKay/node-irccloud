@@ -21,6 +21,10 @@ handlers['makeserver'] = function(body) {
 	delete body.deferred_archives;
 	delete body.disconnected;
 
+	if (!this._loadingBacklog) {
+		this.emit('newConnection', body);
+	}
+
 	this.connections[body.cid] = body;
 };
 
@@ -33,6 +37,10 @@ handlers['makebuffer'] = function(body) {
 	delete body.max_backlog_size;
 
 	body.created = new Date(Math.floor(body.created / 1000));
+
+	if (!this._loadingBacklog) {
+		this.emit('newBuffer', body);
+	}
 
 	this.connections[body.cid].buffers[body.bid] = body;
 };
@@ -64,5 +72,9 @@ handlers['channel_init'] = function(body) {
 
 	if (body.timestamp) {
 		buffer.channelCreated = new Date(body.timestamp * 1000);
+	}
+
+	if (!this._loadingBacklog) {
+		this.emit('channelInit', buffer);
 	}
 };
