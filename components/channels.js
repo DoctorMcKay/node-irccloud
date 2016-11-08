@@ -338,6 +338,15 @@ handlers['rename_conversation'] = function(body) {
 	buffer.name = body.new_name;
 };
 
+handlers['chan_privs_needed'] = function(body) {
+	if (this._loadingBacklog) {
+		return;
+	}
+
+	var buffer = this.connections[body.cid].buffers[body.bid];
+	this.emit('accessDenied', buffer, body.chan, body.msg);
+};
+
 function buildHostObject(body) {
 	return {
 		"user": body.from_name,

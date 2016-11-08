@@ -177,3 +177,10 @@ Same as `action`, except for messages we sent ourselves (potentially on another 
 - `highlight`
 
 Same as `notice`, except for messages we sent ourselves (potentially on another client session).
+
+### accessDenied
+- `buffer`
+- `channel`
+- `msg`
+
+Emitted when you try to do something that requires channel operator (or similar) access, which you don't have.
