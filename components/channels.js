@@ -5,7 +5,7 @@ IRCCloud.prototype.message = function(connection, recipient, message, callback) 
 		connection = connection.cid;
 	}
 
-	if (typeof connection !== 'number') {
+	if (isNaN(connection)) {
 		throw new Error("connection must be either an object with a cid property or a numeric connection ID");
 	}
 
