@@ -26,3 +26,4 @@ require('./components/backlog.js');
 require('./components/connections');
 require('./components/channels.js');
 require('./components/account.js');
+require('./components/buffers.js');
