@@ -2,12 +2,41 @@ var IRCCloud = require('../index.js');
 
 IRCCloud.prototype.getConnection = function(networkName) {
 	for (var i in this.connections) {
-		if (this.connections.hasOwnProperty(i) && this.connections[i].name == networkName) {
+		if (this.connections.hasOwnProperty(i) && (this.connections[i].name == networkName || this.connections[i].hostname == networkName)) {
 			return this.connections[i];
 		}
 	}
 
 	return null;
+};
+
+IRCCloud.prototype.reconnectConnection = function(connection, callback) {
+	if (typeof connection === 'object') {
+		connection = connection.cid;
+	}
+
+	if (isNaN(connection)) {
+		throw new Error("connection must be an object with a cid property or a numeric connection ID");
+	}
+
+	this._send("reconnect", {"cid": connection}, callback);
+};
+
+IRCCloud.prototype.disconnectConnection = function(connection, msg, callback) {
+	if (typeof msg === 'function') {
+		callback = msg;
+		msg = undefined;
+	}
+
+	if (typeof connection === 'object') {
+		connection = connection.cid;
+	}
+
+	if (isNaN(connection)) {
+		throw new Error("connection must be an object with a cid property or a numeric connection ID");
+	}
+
+	this._send("disconnect", {"cid": connection, "msg": msg}, callback);
 };
 
 // Handlers
