@@ -115,7 +115,8 @@ handlers['buffer_msg'] = handlers['buffer_me_msg'] = function(body) {
 	}
 
 	var buffer = this.connections[body.cid].buffers[body.bid];
-	this.emit(body.type == 'buffer_msg' ? 'message' : 'action', buffer, buildHostObject(body), body.msg, !!body.highlight);
+	var suffix = body.from == this.connections[body.cid].nick ? 'Echo' : '';
+	this.emit((body.type == 'buffer_msg' ? 'message' : 'action') + suffix, buffer, buildHostObject(body), body.msg, !!body.highlight);
 
 	if (body.highlight) {
 		this.emit('highlight', buffer, buildHostObject(body), body.msg);
