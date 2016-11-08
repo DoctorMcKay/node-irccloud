@@ -80,10 +80,37 @@ handlers['channel_mode'] = function(body) {
 	var buffer = this.connections[body.cid].buffers[body.bid];
 
 	if (!this._loadingBacklog) {
-		this.emit('mode', buffer, body.ops, body.newmode);
+		this.emit('mode', buffer, body.ops, body.newmode, {
+			"user": body.from_name,
+			"nick": body.from,
+			"host": body.from_host,
+			"hostmask": body.hostmask
+		});
 	}
 
 	buffer.mode = body.newmode;
+};
+
+handlers['user_channel_mode'] = function(body) {
+	var buffer = this.connections[body.cid].buffers[body.bid];
+
+	this.emit('userMode', buffer, {
+		"user": body.target_name,
+		"nick": body.nick,
+		"host": body.target_host,
+		"hostmask": body.target_hostmask
+	}, body.ops, body.newmode, {
+		"user": body.from_name,
+		"nick": body.from,
+		"host": body.from_host,
+		"hostmask": body.hostmask
+	});
+
+	for (var i = 0; i < buffer.users.length; i++) {
+		if (buffers.users[i].nick == body.nick) {
+			buffers.users[i].mode = body.newmode;
+		}
+	}
 };
 
 handlers['channel_mode_is'] = function(body) {

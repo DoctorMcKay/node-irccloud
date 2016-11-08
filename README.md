@@ -12,3 +12,22 @@ TODO
         - `success` - A boolean
 
 Sets a channel's topic, provided you have permission to do so.
+
+# Events
+
+### mode
+- `buffer`
+- `changes`
+- `newMode`
+- `actor`
+
+Emitted when a channel's mode is changed.
+
+### userMode
+- `buffer`
+- `user`
+- `changes`
+- `newMode`
+- `actor`
+
+Emitted when another user's channel mode is changed.
