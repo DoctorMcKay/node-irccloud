@@ -1,5 +1,29 @@
 var IRCCloud = require('../index.js');
 
+IRCCloud.prototype.message = function(connection, recipient, message, callback) {
+	if (typeof connection === 'object') {
+		connection = connection.cid;
+	}
+
+	if (typeof connection !== 'number') {
+		throw new Error("connection must be either an object with a cid property or a numeric connection ID");
+	}
+
+	if (typeof recipient === 'object') {
+		recipient = recipient.name;
+	}
+
+	if (typeof recipient !== 'string') {
+		throw new Error("recipient must be either an object with a name property or a recipient string (channel name or PM nick)");
+	}
+
+	this._send("say", {"cid": connection, "to": recipient, "msg": message}, callback);
+};
+
+IRCCloud.prototype.action = function(connection, recipient, message, callback) {
+	this.message(connection, recipient, "/me " + message, callback);
+};
+
 IRCCloud.prototype.topic = function(buffer, topic, callback) {
 	if (!buffer.cid || !buffer.bid) {
 		throw new Error("Buffer must have cid and bid properties");
