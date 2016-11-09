@@ -1,0 +1,25 @@
+{
+	"White": "\u000300",
+	"Black": "\u000301",
+	"DarkBlue": "\u000302",
+	"DarkGreen": "\u000303",
+	"LightRed": "\u000304",
+	"DarkRed": "\u000305",
+	"Magenta": "\u000306",
+	"Orange": "\u000307",
+	"Yellow": "\u000308",
+	"LightGreen": "\u000309",
+	"Cyan": "\u000310",
+	"LightCyan": "\u000311",
+	"LightBlue": "\u000312",
+	"LightMagenta": "\u000313",
+	"Gray": "\u000314",
+	"LightGray": "\u000315",
+
+	"Bold": "\u0002",
+	"Reverse": "\u0016",
+	"Italic": "\u0001d",
+	"Underline": "\u001f",
+
+	"Reset": "\u000f"
+}

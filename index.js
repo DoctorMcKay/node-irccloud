@@ -2,6 +2,8 @@ module.exports = IRCCloud;
 
 require('util').inherits(IRCCloud, require('events').EventEmitter);
 
+IRCCloud.Colors = require('./resources/colors.json');
+
 function IRCCloud() {
 	this.connected = false;
 	this.uid = null;

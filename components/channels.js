@@ -44,7 +44,7 @@ IRCCloud.prototype.message = function(connection, recipient, message, callback) 
 	}
 
 	if (typeof recipient === 'object') {
-		recipient = recipient.name;
+		recipient = recipient.nick || recipient.name;
 	}
 
 	if (typeof recipient !== 'string') {
