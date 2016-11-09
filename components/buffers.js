@@ -22,8 +22,10 @@ IRCCloud.prototype.getBuffer = function(networkName, bufferName) {
 		return null;
 	}
 
+	bufferName = bufferName.toLowerCase();
+
 	for (var i in conn.buffers) {
-		if (conn.buffers.hasOwnProperty(i) && conn.buffers[i].name == bufferName) {
+		if (conn.buffers.hasOwnProperty(i) && conn.buffers[i].name.toLowerCase() == bufferName) {
 			return conn.buffers[i];
 		}
 	}

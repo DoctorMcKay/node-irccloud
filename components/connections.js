@@ -1,8 +1,10 @@
 var IRCCloud = require('../index.js');
 
 IRCCloud.prototype.getConnection = function(networkName) {
+	networkName = networkName.toLowerCase();
+
 	for (var i in this.connections) {
-		if (this.connections.hasOwnProperty(i) && (this.connections[i].name == networkName || this.connections[i].hostname == networkName)) {
+		if (this.connections.hasOwnProperty(i) && (this.connections[i].name.toLowerCase() == networkName || this.connections[i].hostname.toLowerCase() == networkName)) {
 			return this.connections[i];
 		}
 	}
@@ -22,7 +24,7 @@ IRCCloud.prototype.createConnection = function(options, callback) {
 		"nickname": options.nick,
 		"realname": options.realName || "",
 		"channels": options.channels ? options.channels.join(',') : "",
-		"joincommands": options.joinCommands || "",
+		"joincommands": options.joinCommands ? options.joinCommands.join("\n") : "",
 		"nspass": options.nickservPassword || "",
 		"server_pass": options.serverPassword || "",
 	}, callback);
@@ -76,6 +78,10 @@ var handlers = IRCCloud.prototype._handlers;
 handlers['status_changed'] = function(body) {
 	var conn = this.connections[body.cid];
 
+	if (body.fail_info && body.fail_info.timestamp) {
+		body.fail_info.timestamp = new Date(body.fail_info.timestamp * 1000);
+	}
+
 	this.emit('connectionStatus', conn, body.new_status, body.fail_info);
 
 	conn.status = body.new_status;
@@ -98,7 +104,7 @@ handlers['server_details_changed'] = function(body) {
 		}
 	}
 
-	this.emit('serverChanged', conn, body);
+	this.emit('connectionChanged', conn, body);
 
 	this.connections[body.cid] = body;
 };
