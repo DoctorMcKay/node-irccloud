@@ -42,6 +42,10 @@ handlers['buffer_archived'] = handlers['buffer_unarchived'] = function(body) {
 };
 
 handlers['delete_buffer'] = function(body) {
+	if (!this.connections[body.cid]) {
+		return; // possibly this is being deleted as part of a connection delete
+	}
+
 	var buffer = this.connections[body.cid].buffers[body.bid];
 	this.emit('deleted', buffer);
 	delete this.connections[body.cid].buffers[body.bid];

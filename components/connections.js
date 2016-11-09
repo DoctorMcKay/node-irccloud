@@ -10,6 +10,24 @@ IRCCloud.prototype.getConnection = function(networkName) {
 	return null;
 };
 
+IRCCloud.prototype.createConnection = function(options, callback) {
+	if (['hostname', 'nick'].some(entry => !options[entry])) {
+		throw new Error("To add a new connection, at least hostname and nick are required");
+	}
+
+	this._send("add-server", {
+		"hostname": options.hostname,
+		"port": options.port || 6667,
+		"ssl": options.ssl ? "1" : "0",
+		"nickname": options.nick,
+		"realname": options.realName || "",
+		"channels": options.channels ? options.channels.join(',') : "",
+		"joincommands": options.joinCommands || "",
+		"nspass": options.nickservPassword || "",
+		"server_pass": options.serverPassword || "",
+	}, callback);
+};
+
 IRCCloud.prototype.reconnectConnection = function(connection, callback) {
 	if (typeof connection === 'object') {
 		connection = connection.cid;
@@ -37,6 +55,18 @@ IRCCloud.prototype.disconnectConnection = function(connection, msg, callback) {
 	}
 
 	this._send("disconnect", {"cid": connection, "msg": msg}, callback);
+};
+
+IRCCloud.prototype.deleteConnection = function(connection, callback) {
+	if (typeof connection === 'object') {
+		connection = connection.cid;
+	}
+
+	if (isNaN(connection)) {
+		throw new Error("connection must be an object with a cid property or a numeric connection ID");
+	}
+
+	this._send("delete-connection", {"cid": connection}, callback);
 };
 
 // Handlers
@@ -71,4 +101,15 @@ handlers['server_details_changed'] = function(body) {
 	this.emit('serverChanged', conn, body);
 
 	this.connections[body.cid] = body;
+};
+
+handlers['connection_deleted'] = function(body) {
+	var conn = this.connections[body.cid];
+	if (!conn) {
+		return;
+	}
+
+	this.emit('connectionDeleted', conn);
+
+	delete this.connections[body.cid];
 };
