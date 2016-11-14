@@ -4,6 +4,8 @@ This is a client module for [IRCCloud](https://www.irccloud.com). It allows you 
 You will need at least a free IRCCloud account to use this module. All normal IRCCloud limits apply if you haven't upgraded
 your account.
 
+This isn't quite complete just yet, so some things might be missing or the documentation might be a bit unclear at times.
+
 # Methods
 
 All post-connection methods take an optional callback. If provided, this will be called with a single object argument
