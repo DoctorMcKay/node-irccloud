@@ -259,6 +259,7 @@ handlers['user_mode'] = function(body) {
 		this.emit('youMode', conn, body.ops, body.newmode);
 	}
 
+	conn.self = conn.self || {};
 	conn.self.mode = body.newmode;
 };
 
