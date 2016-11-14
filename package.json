@@ -1,6 +1,6 @@
 {
 	"name": "irccloud",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Client module for IRCCloud.com hosted IRC service",
 	"author": "Alexander Corn <mckay@doctormckay.com>",
 	"license": "MIT",
