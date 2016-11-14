@@ -67,3 +67,8 @@ handlers['heartbeat_echo'] = function(body) {
 		}
 	}
 };
+
+handlers['unknown_command'] = function(body) {
+	var buffer = this.connections[body.cid].buffers[body.bid];
+	this.emit('unknownCommand', buffer, body.command);
+};

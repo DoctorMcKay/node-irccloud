@@ -410,3 +410,10 @@ Emitted when you change your own nick (or it's changed forcefully by the server)
 - `newName` - The new name of the buffer
 
 Emitted when a `conversation` buffer is renamed because the other party changed their nick.
+
+### unknownCommand
+- `buffer` - A buffer object
+- `command` - The command that was unknown
+
+Emitted when you try to run an unknown /command on a server. The provided buffer is the buffer in which the command
+was run.
