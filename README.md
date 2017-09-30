@@ -22,6 +22,14 @@ and [`loaded`](#loaded) once data is fully loaded.
 
 Disconnect an established connection.
 
+### listConnections([getHostnames])
+- `getHostnames` - true if you want to return hostnames (e.g. "chat.freenode.net") instead of network names (e.g. "freenode")
+
+Returns an array containing the names or hostnames of all connections on your account. Should only be used after `loaded`
+is emitted.
+
+This method does not consult the network; it merely pulls data from memory therefore it returns the data immediately.
+
 ### getConnection(networkName)
 - `networkName` - Either the name of the network (e.g. "freenode") or the hostname you connected to (e.g. "chat.freenode.net"), case-insensitive
 

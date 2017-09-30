@@ -1,5 +1,9 @@
 var IRCCloud = require('../index.js');
 
+IRCCloud.prototype.listConnections = function(getHostnames) {
+	return Object.keys(this.connections).map(cid => this.connections[cid][getHostnames ? 'hostname' : 'name']);
+};
+
 IRCCloud.prototype.getConnection = function(networkName) {
 	networkName = networkName.toLowerCase();
 
