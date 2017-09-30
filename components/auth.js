@@ -1,10 +1,12 @@
 var IRCCloud = require('../index.js');
 var Https = require('../util/https_client');
 
-IRCCloud.prototype.connect = function(email, password) {
+IRCCloud.prototype.connect = function(email, password, reconnectAllConnections) {
 	if (!email || !password) {
 		throw new Error("Email and password are required");
 	}
+
+	this._reconnectConns = !!reconnectAllConnections;
 
 	// Get our form token
 	Https.post("https://www.irccloud.com/chat/auth-formtoken", (err, res) => {

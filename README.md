@@ -11,12 +11,17 @@ This isn't quite complete just yet, so some things might be missing or the docum
 All post-connection methods take an optional callback. If provided, this will be called with a single object argument
 when the method has been successfully executed by IRCCloud. This object will always have a boolean `success` property.
 
-### connect(email, password)
+### connect(email, password[, reconnectAllConnections])
 - `email` - Your account's email address
 - `password` - Your account's password
+- `reconnectAllConnections` - Optional. Pass true here to automatically reconnect all connections that have a status of `disconnected` once we connect to IRCCloud. Default false.
 
 Start the process of logging in and connecting to IRCCloud. You will get a [`connect`](#connect) event once connected,
 and [`loaded`](#loaded) once data is fully loaded.
+
+If you have a free account which is subject to being diconnected from IRC after 2 hours of inactivity, you could pass
+`true` to `reconnectAllConnections` to automatically reconnect to IRC once your bot starts back up. If you use this
+functionality, the reconnect process will be initiated after `loaded` is emitted.
 
 ### disconnect()
 

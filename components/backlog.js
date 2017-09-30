@@ -9,6 +9,14 @@ handlers['backlog_starts'] = function(body) {
 handlers['backlog_complete'] = function(body) {
 	this._loadingBacklog = false;
 	this.emit('loaded');
+
+	if (this._reconnectConns) {
+		delete this._reconnectConns;
+		this.listConnections()
+			.map(connName => this.getConnection(connName))
+			.filter(conn => conn.status == 'disconnected')
+			.forEach(conn => this.reconnectConnection(conn));
+	}
 };
 
 handlers['makeserver'] = function(body) {
