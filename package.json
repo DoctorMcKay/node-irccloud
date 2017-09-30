@@ -10,5 +10,8 @@
 	},
 	"dependencies": {
 		"websocket13": "^1.2.1"
+	},
+	"engines": {
+		"node": ">=4.0.0"
 	}
 }
