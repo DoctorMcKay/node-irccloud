@@ -137,6 +137,19 @@ Identical to the `message` method except prefixes the `message` with `/me `.
 
 Sets a channel's topic, provided you have permission to do so.
 
+### paste(options[, callback])
+- `options` - An object with the following properties:
+    - `contents` - Required. The contents of your paste
+    - `name` - Optional. A filename for your paste
+    - `extension` - Optional. A file extension for your paste
+- `callback` - Optional. Normal method callback. Properties of interest:
+    - `url` - The URL where your paste can be viewed. This is what you should send over IRC.
+    - `id` - The ID for your paste
+    - `size` - Paste size in bytes
+    - `lines` - Number of lines in paste
+
+Create a pastebin.
+
 # Events
 
 ### error

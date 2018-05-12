@@ -29,3 +29,4 @@ require('./components/connections');
 require('./components/channels.js');
 require('./components/account.js');
 require('./components/buffers.js');
+require('./components/pastebin.js');
