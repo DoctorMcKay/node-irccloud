@@ -9,9 +9,9 @@
 		"url": "https://github.com/DoctorMcKay/node-irccloud"
 	},
 	"dependencies": {
-		"websocket13": "^1.2.1"
+		"websocket13": "^2.0.0"
 	},
 	"engines": {
-		"node": ">=4.0.0"
+		"node": ">=6.0.0"
 	}
 }
