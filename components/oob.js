@@ -5,7 +5,7 @@ IRCCloud.prototype._handlers['oob_include'] = function(body) {
 	this.emit('debug', `Handling oob_include (expires in ${body.timeout} ms)`);
 	this._setPause(true);
 
-	Https.getAuthed("https://www.irccloud.com" + body.url, this._sessionToken, (err, res) => {
+	Https.getAuthed((body.api_host || "https://www.irccloud.com") + body.url, this._sessionToken, (err, res) => {
 		if (err) {
 			this.emit('error', err);
 			this.disconnect();
